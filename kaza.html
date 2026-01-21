@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Kaza Namazı Takip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/869/869869.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kaza Namazı">
+  <style>
+    body { font-family:-apple-system, Arial; background:#f4f6f8; margin:0; padding:15px; }
+    h1 { text-align:center; }
+    .card {
+      background:#fff; padding:14px; margin-bottom:10px;
+      border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .btns { display:flex; gap:8px; }
+    button {
+      padding:8px 14px; border:none; border-radius:8px;
+      background:#2563eb; color:#fff; font-size:16px;
+    }
+    .plus { background:#16a34a; }
+    button:active { opacity:0.7; }
+    .reset { background:#dc2626; width:100%; margin-top:15px; }
+    .total { text-align:center; margin:15px 0; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+<h1>📿 Kaza Namazı Takip</h1>
+<div class="total" id="total"></div>
+<div id="app"></div>
+<button class="reset" onclick="resetAll()">Sıfırla</button>
+
+<script>
+const vakitler = ["Sabah","Öğle","İkindi","Akşam","Yatsı"];
+let data = JSON.parse(localStorage.getItem("kazaData"));
+
+if (!data) {
+  data = { Sabah:3300, Öğle:3300, İkindi:3300, Akşam:3300, Yatsı:3300 };
+  save();
+}
+
+function save() {
+  localStorage.setItem("kazaData", JSON.stringify(data));
+}
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  let toplam = 0;
+  vakitler.forEach(v => {
+    toplam += data[v];
+    app.innerHTML += `
+      <div class="card">
+        <div><strong>${v}</strong><br>Kalan: ${data[v]}</div>
+        <div class="btns">
+          <button onclick="dus('${v}')">-1</button>
+          <button class="plus" onclick="arttir('${v}')">+1</button>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById("total").innerText = "Toplam Kalan: " + toplam;
+}
+
+function dus(v) {
+  if (data[v] > 0) {
+    data[v]--;
+    save();
+    render();
+  }
+}
+
+function arttir(v) {
+  data[v]++;
+  save();
+  render();
+}
+
+function resetAll() {
+  if(confirm("Tüm veriler sıfırlansın mı?")) {
+    localStorage.removeItem("kazaData");
+    location.reload();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
